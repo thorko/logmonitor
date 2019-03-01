@@ -1,0 +1,20 @@
+Log:
+  File: /var/log/logmonitor.log
+  Level: Info
+
+Daemon:
+  Pid: /var/run/logmonitor.pid
+  Listen: 127.0.0.1:3333
+
+DB:
+  File: /var/lib/logmonitor/test.db
+
+Watch:
+  File: /var/log/mail.log
+
+Patterns:
+  outgoing: 'postfix\/smtp.*to.*relay=(?!(local|127\.0\.0)).*status=sent'
+  deferred: 'postfix\/smtp.*to.*relay=(?!(local|127\.0\.0)).*status=deferred'
+  received: 'postfix\/local.*to.*relay=(local|127\.0\.0\.1).*status=sent'
+  spam: 'spam(p)?d.*identified spam'
+

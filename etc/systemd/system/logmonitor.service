@@ -1,0 +1,13 @@
+[Unit]
+Description=Logmonitor
+After=network.target 
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/logmonitor 
+PIDFile=/var/run/logmonitor.pid
+ExecStop=/bin/kill -SIGTERM ${MAINPID}
+ExecReload=/usr/local/sbin/logmonitor -x reload
+
+[Install]
+WantedBy=multi-user.target
