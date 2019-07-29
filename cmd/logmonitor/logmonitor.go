@@ -101,7 +101,7 @@ func handleConnection(c net.Conn, dbFile string, rr map[string]string) {
 					// loop through all keys in config
 					ts := time.Now().UnixNano()
 					for key, _ := range rr {
-						store.Get(request[1], &value)
+						store.Get(key, &value)
 						// write influxdb_line
 						c.Write([]byte(fmt.Sprintf("logstats,pattern=%s %d %d", key, value, ts)))
 					}
