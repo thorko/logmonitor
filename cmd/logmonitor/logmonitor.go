@@ -76,7 +76,7 @@ func resetAllCounter(dbFile string, counter map[string]string) error {
 	return nil
 }
 
-func handleConnection(c net.Conn, dbFile string) {
+func handleConnection(c net.Conn, dbFile string, rr map[string]string) {
 	log.Printf("Serving %s\n", c.RemoteAddr().String())
 	for {
 		netData, err := bufio.NewReader(c).ReadString('\n')
@@ -97,9 +97,19 @@ func handleConnection(c net.Conn, dbFile string) {
 		} else {
 			value := 0
 			if request[0] == "get" {
-				log.Printf("get key: %s", request[1])
-				store.Get(request[1], &value)
-				c.Write([]byte(fmt.Sprintf("%d\n", value)))
+				if request[1] == "all" {
+					// loop through all keys in config
+					ts := time.Now().UnixNano()
+					for key, _ := range rr {
+						store.Get(request[1], &value)
+						// write influxdb_line
+						c.Write([]byte(fmt.Sprintf("logstats,pattern=%s %d %d", key, value, ts)))
+					}
+				} else {
+					log.Printf("get key: %s", request[1])
+					store.Get(request[1], &value)
+					c.Write([]byte(fmt.Sprintf("%d\n", value)))
+				}
 			}
 			if request[0] == "reset" {
 				log.Printf("resetting key: %s", request[1])
@@ -210,7 +220,7 @@ func main() {
 				log.Printf("Error connecting: %s", err)
 				return
 			}
-			handleConnection(c, dbFile)
+			handleConnection(c, dbFile, rr)
 		}
 
 	}()
