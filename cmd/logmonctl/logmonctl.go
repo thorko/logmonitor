@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strings"
 
 	"github.com/MiLk/kingpin"
 	config "github.com/micro/go-config"
@@ -53,13 +54,24 @@ func main() {
 				fmt.Printf("Couldn't connect to %s, err: %s\n", address, err)
 				os.Exit(1)
 			} else {
-				fmt.Fprintf(conn, "get "+key+"\n")
-				response, err := bufio.NewReader(conn).ReadString('\n')
-				if err != nil {
-					fmt.Println(err)
-					os.Exit(1)
+				if key == "all" {
+					fmt.Fprintf(conn, "get "+key+"\n")
+					response, err := bufio.NewReader(conn).ReadString(';')
+					if err != nil {
+						fmt.Println(err)
+						os.Exit(1)
+					} else {
+						fmt.Printf("%s", strings.Trim(response, ";"))
+					}
 				} else {
-					fmt.Printf("%s", response)
+					fmt.Fprintf(conn, "get "+key+"\n")
+					response, err := bufio.NewReader(conn).ReadString('\n')
+					if err != nil {
+						fmt.Println(err)
+						os.Exit(1)
+					} else {
+						fmt.Printf("%s", response)
+					}
 				}
 			}
 		}
