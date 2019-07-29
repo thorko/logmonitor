@@ -100,11 +100,11 @@ func handleConnection(c net.Conn, dbFile string, rr map[string]string) {
 				if request[1] == "all" {
 					// loop through all keys in config
 					log.Printf("Get all keys")
-					ts := time.Now().UnixNano()
+					ts := time.Now().Unix()
 					for key, _ := range rr {
 						store.Get(key, &value)
 						// write influxdb_line
-						c.Write([]byte(fmt.Sprintf("logstats,pattern=%s %d %d\n", key, value, ts)))
+						c.Write([]byte(fmt.Sprintf("logstats,pattern=%s count=%d %d\n", key, value, ts)))
 					}
 					c.Write([]byte(fmt.Sprintf(";")))
 				} else {
